@@ -1,121 +1,80 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
 
+const WINNING_LINES = [
+  [0,1,2], [3,4,5], [6,7,8], //lignes
+  [0,3,6], [1,4,7], [2,5,8], //colonnes
+  [0,4,8], [2,4,6]           //diagonales
+]
+
+function GetWinner(board){
+    //parcourir chaque ligne gagnate possible définie dans WINNING_LINES
+    //Chaque lignes est un tableau de 3 indices [a,b,c] représentant les positions à vérifier
+    for(const [a , b , c] of WINNING_LINES){
+      // vérifie si les trois conditions sont remplies pour une victoire
+      // 1. board[a] n'est pas null (la case 'a' doit etre occupée)
+      // 2. board[a] === board[b] (contiennent le meme symbole)
+      // 3. board[a] === board[c] (contiennent le meme symbole)
+      if (board[a] && board[a] === board[b] && board[a] === board[c]){
+        // si les trois cases correspondent 
+        // retourne le symbole ('X' ou 'O') comme gagnant
+        return board[a]
+      }
+    }
+
+    // si aucune ligne gagnante n'est trouvée, retourne null (pas de gagnant)
+    return null
+    
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+
+  //utilisation de useState pour le tableau pour un nouveau rendu à chaque changement
+  const [board, setBoard]= useState(Array(9).fill(null))
+  const [isX, setIsX] = useState(true)
+  
+  const winner = GetWinner(board)
+  const isDraw = !winner && board.every(Boolean) // retourne true si chaque element du tableau est "truthy", cad ni null, ni undefined, ni une chaine vide
+
+  function handleClick(i){
+    //Est ce qu'il n'y a pas deja quelque chose sur la case ?
+    if (board[i] || winner) return
+    //est-ce qu'il y a un vainqueur ?
+    const newBoard = [...board] // crée une copie conforme du tableau pour pouvoir le modifier
+    newBoard[i] = isX ? 'X' : 'O'
+    setBoard(newBoard)
+    setIsX(!isX)
+    }
+
+  function reset (){
+      setBoard(Array(9).fill(null))
+      setIsX(true)      
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+      <div className='game'>
+        <h1>Tic Tac Toe</h1>
+          <p className='status'>
+            {winner ?
+              <span>Gagnant : <img className='status-img' src={winner === 'X' ? '/cross.png' : '/circle.png'}/></span>
+              : isDraw ? "Match nul !"
+              : <span>Tour du joueur : <img className='status-img' src={isX ? '/cross.png' : '/circle.png'}/></span>
+            }
           </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className='board'>
+            {board.map((cell,i) => (
+              <button key={i} className='cell' onClick={() => handleClick(i)}>
+                {cell && <img src={cell === 'X' ? '/cross.png' : '/circle.png'}/>}
+              </button>
+          
+            ))}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            <button className="reset" onClick={reset}>Rejouer</button>
+
+      </div>
+    )
 }
 
 export default App
