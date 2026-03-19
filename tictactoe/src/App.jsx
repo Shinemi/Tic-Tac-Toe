@@ -32,7 +32,8 @@ function App() {
   //utilisation de useState pour le tableau pour un nouveau rendu à chaque changement
   const [board, setBoard]= useState(Array(9).fill(null))
   const [isX, setIsX] = useState(true)
-  
+  const [scores, setScores]= useState([0,0])
+
   const winner = GetWinner(board)
   const isDraw = !winner && board.every(Boolean) // retourne true si chaque element du tableau est "truthy", cad ni null, ni undefined, ni une chaine vide
 
@@ -44,16 +45,30 @@ function App() {
     newBoard[i] = isX ? 'X' : 'O'
     setBoard(newBoard)
     setIsX(!isX)
+    const newWinner = GetWinner(newBoard)
+    if (newWinner==='X') {
+      setScores(s => [s[0]+1, s[1]])
+
+    } else if (newWinner === "O"){
+      setScores(s => [s[0], s[1]+1])
     }
+  }
 
   function reset (){
       setBoard(Array(9).fill(null))
       setIsX(true)      
   }
 
+
+
   return (
       <div className='game'>
         <h1>Tic Tac Toe</h1>
+
+          <p className='score'>
+            x : {scores[0]}  <br />o : {scores[1]}
+          </p>
+
           <p className='status'>
             {winner ?
               <span>Gagnant : <img className='status-img' src={winner === 'X' ? '/cross.png' : '/circle.png'}/></span>
