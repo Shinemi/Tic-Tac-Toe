@@ -27,6 +27,13 @@ function GetWinner(board){
     
 }
 
+function coupOrdi (newBoard) {
+  const caseJouables = newBoard.map((cell, i) => cell === null ? i : null).filter(i => i !== null)
+  const coupOrdi = Math.floor(Math.random() * caseJouables.length)
+
+  return coupOrdi
+}
+
 function App() {
 
   //utilisation de useState pour le tableau pour un nouveau rendu à chaque changement
@@ -42,7 +49,7 @@ function App() {
     if (board[i] || winner) return
     //est-ce qu'il y a un vainqueur ?
     const newBoard = [...board] // crée une copie conforme du tableau pour pouvoir le modifier
-    newBoard[i] = isX ? 'X' : 'O'
+    newBoard[i] = isX ? 'X' : coupOrdi(newBoard) // old version : 'O'
     setBoard(newBoard)
     setIsX(!isX)
     const newWinner = GetWinner(newBoard)
@@ -52,6 +59,8 @@ function App() {
     } else if (newWinner === "O"){
       setScores(s => [s[0], s[1]+1])
     }
+
+    
   }
 
   function reset (){
