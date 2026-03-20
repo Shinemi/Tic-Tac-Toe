@@ -27,12 +27,12 @@ function GetWinner(board){
     
 }
 
-function coupOrdi (newBoard) {
+function coupOrdi(newBoard) {
   const caseJouables = newBoard.map((cell, i) => cell === null ? i : null).filter(i => i !== null)
-  const coupOrdi = Math.floor(Math.random() * caseJouables.length)
-
-  return coupOrdi
+  const indexAleatoire = Math.floor(Math.random() * caseJouables.length)
+  return caseJouables[indexAleatoire] //  la vraie case, pas juste l'indice
 }
+
 
 function App() {
 
@@ -47,26 +47,35 @@ function App() {
   function handleClick(i){
     //Est ce qu'il n'y a pas deja quelque chose sur la case ?
     if (board[i] || winner) return
-    //est-ce qu'il y a un vainqueur ?
+    
     const newBoard = [...board] // crée une copie conforme du tableau pour pouvoir le modifier
-    newBoard[i] = isX ? 'X' : coupOrdi(newBoard) // old version : 'O'
+    
+    // si c'est le tour du joueur (X), il joue sur la case cliquée
+    // si c'est le tour de l'ordi (O), il choisit une case aléatoire
+    if (isX) {
+      newBoard[i] = 'X'
+    } else {
+      const caseOrdi = coupOrdi(newBoard)
+      newBoard[caseOrdi] = 'O'
+    }
+    
     setBoard(newBoard)
     setIsX(!isX)
+    
     const newWinner = GetWinner(newBoard)
     if (newWinner==='X') {
       setScores(s => [s[0]+1, s[1]])
-
     } else if (newWinner === "O"){
       setScores(s => [s[0], s[1]+1])
     }
-
-    
-  }
+}
 
   function reset (){
       setBoard(Array(9).fill(null))
       setIsX(true)      
   }
+
+
 
 
 
